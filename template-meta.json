@@ -1,0 +1,8 @@
+{
+  "name": "WordPress Pro | Redis Cache, Nightly Backups, Secure Setup",
+  "short_name": "WordPress Pro",
+  "description": "WordPress with Redis object cache, nightly backups and no open installer",
+  "category": "CMS",
+  "image": "https://raw.githubusercontent.com/WordPress/WordPress/master/wp-admin/images/wordpress-logo.svg",
+  "card_desc": "WordPress on MariaDB with a Redis object cache, nightly backups to a Railway bucket, and an admin password generated before the site ever goes public."
+}

@@ -1,0 +1,186 @@
+{
+  "buckets": {
+    "92036a58-85e6-42bc-9cbe-a87f3075465c": {
+      "name": "Backups"
+    }
+  },
+  "services": {
+    "4fa411c8-d2e4-4fa2-9a0d-c8fa28c86e12": {
+      "icon": "https://raw.githubusercontent.com/WordPress/WordPress/master/wp-admin/images/wordpress-logo.svg",
+      "name": "WordPress",
+      "build": {
+        "dockerfilePath": "Dockerfile"
+      },
+      "deploy": {
+        "startCommand": null,
+        "healthcheckPath": "/healthz",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "repo": "https://github.com/nomideusz/wordpress-railway",
+        "rootDirectory": "/"
+      },
+      "variables": {
+        "PORT": {
+          "defaultValue": "8080",
+          "description": "Port Apache listens on - leave as is",
+          "isOptional": false
+        },
+        "WP_ADMIN_PASSWORD": {
+          "defaultValue": "${{secret(20)}}",
+          "description": "Password for the 'admin' login, set on first boot only - change it in WordPress afterwards",
+          "isOptional": false
+        },
+        "WP_ADMIN_EMAIL": {
+          "defaultValue": "admin@example.com",
+          "description": "Admin email, set on first boot only - change it in Settings > General",
+          "isOptional": false
+        },
+        "WORDPRESS_DB_HOST": {
+          "defaultValue": "${{MariaDB.RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "MariaDB host - private network only, leave as is",
+          "isOptional": false
+        },
+        "WORDPRESS_DB_NAME": {
+          "defaultValue": "${{MariaDB.MARIADB_DATABASE}}",
+          "description": "Database name - wired to the bundled MariaDB, leave as is",
+          "isOptional": false
+        },
+        "WORDPRESS_DB_USER": {
+          "defaultValue": "${{MariaDB.MARIADB_USER}}",
+          "description": "Database user - wired to the bundled MariaDB, leave as is",
+          "isOptional": false
+        },
+        "WORDPRESS_DB_PASSWORD": {
+          "defaultValue": "${{MariaDB.MARIADB_PASSWORD}}",
+          "description": "Database password - wired to the bundled MariaDB, leave as is",
+          "isOptional": false
+        },
+        "WP_REDIS_HOST": {
+          "defaultValue": "${{Redis.RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Redis object cache host. Empty = no object cache",
+          "isOptional": true
+        },
+        "WP_REDIS_PORT": {
+          "defaultValue": "6379",
+          "description": "Redis port",
+          "isOptional": true
+        },
+        "WP_REDIS_PASSWORD": {
+          "defaultValue": "${{Redis.REDIS_PASSWORD}}",
+          "description": "Redis password - wired to the bundled Redis, leave as is",
+          "isOptional": true
+        },
+        "S3_ENDPOINT": {
+          "defaultValue": "${{Backups.ENDPOINT}}",
+          "description": "Nightly backups go to the bundled bucket - leave as is",
+          "isOptional": true
+        },
+        "S3_BUCKET": {
+          "defaultValue": "${{Backups.BUCKET}}",
+          "description": "Backup bucket name. Empty = no nightly backups",
+          "isOptional": true
+        },
+        "S3_REGION": {
+          "defaultValue": "${{Backups.REGION}}",
+          "description": "Backup bucket region",
+          "isOptional": true
+        },
+        "S3_ACCESS_KEY_ID": {
+          "defaultValue": "${{Backups.ACCESS_KEY_ID}}",
+          "description": "Backup bucket credentials",
+          "isOptional": true
+        },
+        "S3_SECRET_ACCESS_KEY": {
+          "defaultValue": "${{Backups.SECRET_ACCESS_KEY}}",
+          "description": "Backup bucket credentials",
+          "isOptional": true
+        }
+      },
+      "networking": {
+        "serviceDomains": {
+          "<hasDomain>": {}
+        }
+      },
+      "volumeMounts": {
+        "4fa411c8-d2e4-4fa2-9a0d-c8fa28c86e12": {
+          "mountPath": "/var/www/html"
+        }
+      }
+    },
+    "f0b780cb-f797-4c27-8733-7cb8f67e796c": {
+      "icon": "https://raw.githubusercontent.com/docker-library/docs/master/mariadb/logo.png",
+      "name": "MariaDB",
+      "build": {},
+      "deploy": {
+        "startCommand": "docker-entrypoint.sh mariadbd --datadir=/var/lib/mysql/data",
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "mariadb:11.8.9"
+      },
+      "variables": {
+        "MARIADB_DATABASE": {
+          "defaultValue": "wordpress",
+          "description": "Database name",
+          "isOptional": false
+        },
+        "MARIADB_USER": {
+          "defaultValue": "wordpress",
+          "description": "Database user for WordPress",
+          "isOptional": false
+        },
+        "MARIADB_PASSWORD": {
+          "defaultValue": "${{secret(32)}}",
+          "description": "Auto-generated database password",
+          "isOptional": false
+        },
+        "MARIADB_ROOT_PASSWORD": {
+          "defaultValue": "${{secret(32)}}",
+          "description": "Auto-generated root password",
+          "isOptional": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Time for MariaDB to shut down cleanly on redeploy",
+          "isOptional": false
+        }
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {
+        "f0b780cb-f797-4c27-8733-7cb8f67e796c": {
+          "mountPath": "/var/lib/mysql"
+        }
+      }
+    },
+    "e68fa26b-88da-48b2-a05c-71c0d28ad72f": {
+      "icon": "https://devicons.railway.com/i/redis.svg",
+      "name": "Redis",
+      "build": {},
+      "deploy": {
+        "startCommand": "/bin/sh -c \"exec docker-entrypoint.sh redis-server --requirepass $REDIS_PASSWORD --save '' --appendonly no --maxmemory 128mb --maxmemory-policy allkeys-lru\"",
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "redis:8.10.2-alpine"
+      },
+      "variables": {
+        "REDIS_PASSWORD": {
+          "defaultValue": "${{secret(32)}}",
+          "description": "Auto-generated Redis password",
+          "isOptional": false
+        }
+      },
+      "networking": {
+        "serviceDomains": {}
+      }
+    }
+  }
+}

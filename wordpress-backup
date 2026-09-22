@@ -1,0 +1,19 @@
+#!/bin/bash
+# Pack the database dump, wp-content and wp-config.php (it holds the salts) and
+# upload them to the Railway bucket. Keyed by weekday: the bucket always holds the
+# last 7 nightly backups. Run it by hand (railway ssh) before risky changes.
+set -euo pipefail
+
+f=/tmp/wordpress-$(date -u +%a).tar.gz
+tmp=$(mktemp -d)
+trap 'rm -rf "$f" "$tmp"' EXIT
+
+chown www-data "$tmp"
+wp db export "$tmp/database.sql" --single-transaction --quiet
+tar -czf "$f" --exclude=wp-content/cache --exclude=wp-content/upgrade \
+  -C "$tmp" database.sql -C /var/www/html wp-config.php wp-content
+# Railway buckets are virtual-hosted style: https://<bucket>.<endpoint host>/<key>
+curl -fsS --aws-sigv4 "aws:amz:${S3_REGION:-auto}:s3" \
+  -u "$S3_ACCESS_KEY_ID:$S3_SECRET_ACCESS_KEY" \
+  -T "$f" "https://$S3_BUCKET.${S3_ENDPOINT#https://}/${f##*/}"
+echo "wordpress-backup: uploaded ${f##*/} ($(du -h "$f" | cut -f1))"

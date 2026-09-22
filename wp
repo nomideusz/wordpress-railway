@@ -1,0 +1,6 @@
+#!/bin/sh
+# WP-CLI as the web server user, so the files it writes stay writable by WordPress.
+if [ "$(id -u)" = 0 ]; then
+	exec setpriv --reuid=www-data --regid=www-data --init-groups env HOME=/tmp php /usr/local/lib/wp-cli.phar "$@"
+fi
+exec php /usr/local/lib/wp-cli.phar "$@"

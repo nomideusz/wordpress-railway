@@ -1,0 +1,21 @@
+#!/bin/bash
+# Restore a nightly backup from the Railway bucket, e.g. `wordpress-restore Mon`:
+# replaces the database and wp-content with the backup's. Run it in railway ssh.
+set -euo pipefail
+
+day=${1:?usage: wordpress-restore Mon|Tue|Wed|Thu|Fri|Sat|Sun}
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+curl -fsS --aws-sigv4 "aws:amz:${S3_REGION:-auto}:s3" \
+  -u "$S3_ACCESS_KEY_ID:$S3_SECRET_ACCESS_KEY" \
+  -o "$tmp/backup.tar.gz" "https://$S3_BUCKET.${S3_ENDPOINT#https://}/wordpress-$day.tar.gz"
+tar -xzf "$tmp/backup.tar.gz" -C "$tmp" database.sql wp-content
+chown -R www-data:www-data "$tmp"
+wp db import "$tmp/database.sql"
+rm -rf /var/www/html/wp-content.old
+mv /var/www/html/wp-content /var/www/html/wp-content.old
+mv "$tmp/wp-content" /var/www/html/wp-content
+rm -rf /var/www/html/wp-content.old
+wp cache flush
+echo "wordpress-restore: restored wordpress-$day"
