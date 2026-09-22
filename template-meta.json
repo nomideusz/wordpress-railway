@@ -5,5 +5,6 @@
   "category": "CMS",
   "image": "https://raw.githubusercontent.com/WordPress/WordPress/master/wp-admin/images/wordpress-logo.svg",
   "card_desc": "WordPress on MariaDB with a Redis object cache, nightly backups to a Railway bucket, and an admin password generated before the site ever goes public.",
-  "id": "1723d48d-934c-48e1-b7b2-2c06cfc4dbbf"
+  "id": "1723d48d-934c-48e1-b7b2-2c06cfc4dbbf",
+  "published": true
 }
