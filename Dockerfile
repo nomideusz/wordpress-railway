@@ -59,6 +59,12 @@ RUN set -eux; \
 	echo ok > /usr/local/share/railway/healthz
 COPY railway.conf /etc/apache2/conf-enabled/railway.conf
 
+# The visitor's address: Railway's edge connects from 100.64.0.0/10 and sets X-Real-IP
+# to the client (overwriting what the client sent). The image reads X-Forwarded-For
+# from private ranges only; on Railway that logged the edge, and X-Forwarded-For also
+# ends in an edge hop, so WordPress (comments, login limits) saw the proxy for everyone.
+RUN printf '%s\n' 'RemoteIPHeader X-Real-IP' 'RemoteIPInternalProxy 100.64.0.0/10' > /etc/apache2/conf-available/remoteip.conf
+
 COPY --chmod=0755 wp wordpress-backup wordpress-restore /usr/local/bin/
 COPY --chmod=0755 railway-entrypoint.sh /railway-entrypoint.sh
 ENTRYPOINT ["/railway-entrypoint.sh"]
