@@ -39,7 +39,7 @@ The stack is four pieces: WordPress (Apache and PHP 8.3), a private MariaDB, a p
 
 **Backups and restore.** Backups appear in the Backups bucket as `wordpress-Mon.tar.gz` … `wordpress-Sun.tar.gz`, each holding the database, `wp-content` and `wp-config.php`. For an extra backup before a risky change, run `wordpress-backup` in a `railway ssh` session on the WordPress service. It replaces today's file. To roll back, run `wordpress-restore Mon` (or any other weekday) there. It replaces the database and `wp-content` with that backup's.
 
-**Memory.** Around 60 MB for WordPress at idle and 100 MB for MariaDB, growing with traffic. Apache runs one process per concurrent request and sizes the pool from the plan's memory: 4 processes on a 512 MB plan, up to 64. Set `WP_APACHE_WORKERS` on the WordPress service to choose the number yourself.
+**Memory.** About 150 MB for WordPress once it has served some traffic (40 MB right after a start), 150 MB for MariaDB and 20 MB for Redis. Apache runs one process per concurrent request and sizes the pool from the plan's memory: 4 processes on a 512 MB plan, up to 64. Set `WP_APACHE_WORKERS` on the WordPress service to choose the number yourself.
 
 **Custom domain.** Add it in the WordPress service's Settings → Networking, then move the site over from `railway ssh`: `wp search-replace 'https://<old domain>' 'https://<new domain>' --all-tables && wp cache flush`. This updates the site address and the links inside your posts.
 
