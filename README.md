@@ -1,6 +1,6 @@
 # Deploy and Host WordPress on Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/wordpress-pro?utm_medium=integration&utm_source=button&utm_campaign=wordpress-pro)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/wordpress-pro?referralCode=sLjDXb&utm_medium=integration&utm_source=button&utm_campaign=wordpress-pro)
 
 [WordPress](https://wordpress.org/) is the open-source CMS behind over 40% of the web: blogs, company sites, portfolios and, with WooCommerce, online shops, with thousands of themes and plugins. This template runs the official WordPress image the way a managed WordPress host sets it up: MariaDB, a Redis object cache, nightly backups, and no open installer.
 
