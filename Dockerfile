@@ -2,7 +2,7 @@
 # this template at once. Bump deliberately. This fixes PHP, Apache and the
 # WordPress version of the first install; after that WordPress updates itself
 # from the dashboard as usual.
-FROM wordpress:7.1.2-php8.3-apache
+FROM wordpress:7.1.3-php8.3-apache
 
 # phpredis for the object cache, and the MariaDB client that `wp db export` runs.
 RUN set -eux; \
