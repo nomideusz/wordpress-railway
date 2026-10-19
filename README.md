@@ -29,7 +29,7 @@ The stack is four pieces: WordPress (Apache and PHP 8.3), a private MariaDB, a p
 
 - [WordPress documentation](https://wordpress.org/documentation/)
 - [WP-CLI commands](https://developer.wordpress.org/cli/commands/)
-- [Template source on GitHub](https://github.com/nomideusz/wordpress-railway)
+- [Template source on GitHub](https://github.com/two-workspaces/wordpress)
 
 ### Implementation Details
 
